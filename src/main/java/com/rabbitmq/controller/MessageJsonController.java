@@ -1,5 +1,6 @@
 package com.rabbitmq.controller;
 
+import com.rabbitmq.dto.Product;
 import com.rabbitmq.dto.UserDTO;
 import com.rabbitmq.producer.RabbitMQJsonProducer;
 import org.apache.logging.log4j.LogManager;
@@ -24,5 +25,12 @@ public class MessageJsonController {
         logger.info("MessageJsonController - Inside sendJsonMessage method");
         rabbitMQJsonProducer.sendJsonMessage(userDTO);
         return ResponseEntity.ok("Json Message Send Successfully!!!");
+    }
+
+    @PostMapping("/product")
+    public ResponseEntity<String> sendProductMessage(@RequestBody Product product){
+        logger.info("MessageJsonController - Inside sendProductMessage method");
+        rabbitMQJsonProducer.sendProductMessage(product);
+        return ResponseEntity.ok("Product Send Successfully!!!");
     }
 }

@@ -26,6 +26,13 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.exchange.json.name}")
     private String jsonExchange;
 
+    @Value("${bottle.queue}")
+    private String bottleQueue;
+    @Value("${bottle.exchange}")
+    private String bottleExchange;
+    @Value("${bottle.routing.key}")
+    private String bottleRoutingKey;
+
 
     @Bean
     public Queue queue() {
@@ -81,4 +88,19 @@ public class RabbitMQConfig {
         return rabbitTemplate;
     }
 
+    @Bean
+    public Queue bottleQueue(){
+        return new Queue(bottleQueue);
+    }
+    @Bean
+    public TopicExchange bottleExchange(){
+        return new TopicExchange(bottleExchange);
+    }
+    @Bean
+    public Binding bottleBinding(){
+        return BindingBuilder
+                .bind(bottleQueue())
+                .to(bottleExchange())
+                .with(bottleRoutingKey);
+    }
 }

@@ -1,5 +1,6 @@
 package com.rabbitmq.producer;
 
+import com.rabbitmq.dto.Product;
 import com.rabbitmq.dto.UserDTO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,6 +15,10 @@ public class RabbitMQJsonProducer {
     private String jsonExchange;
     @Value("${rabbitmq.routing.json.key}")
     private String jsonRoutingKey;
+    @Value("${bottle.exchange}")
+    private String bottleExchange;
+    @Value("${bottle.routing.key}")
+    private String bottleRoutingKey;
     private RabbitTemplate rabbitTemplate;
 
     public RabbitMQJsonProducer(RabbitTemplate rabbitTemplate) {
@@ -24,5 +29,10 @@ public class RabbitMQJsonProducer {
         logger.info("RabbitMQJsonProducer - Inside sendJsonMessage method");
         logger.info("User = " + userDTO.toString());
         rabbitTemplate.convertAndSend(jsonExchange, jsonRoutingKey, userDTO);
+    }
+
+    public void sendProductMessage(Product product){
+        logger.info("RabbitMQJsonProducer - Inside sendJsonMessage method");
+        rabbitTemplate.convertAndSend(bottleExchange, bottleRoutingKey, product);
     }
 }
