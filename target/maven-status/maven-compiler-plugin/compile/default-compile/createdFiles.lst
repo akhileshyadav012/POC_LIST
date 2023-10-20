@@ -1,0 +1,8 @@
+com/userservice/entity/Rating.class
+com/userservice/service/IUserService.class
+com/userservice/entity/User.class
+com/userservice/repository/UserRepository.class
+com/userservice/UserServiceApplication.class
+com/userservice/controller/UserController.class
+com/userservice/service/impl/UserServiceImpl.class
+com/userservice/exceptions/NotFoundException.class
