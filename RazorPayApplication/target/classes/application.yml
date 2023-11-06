@@ -1,0 +1,24 @@
+server:
+  port: 9091
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/razor_pay
+    username: root
+    password: P@ssw0rd!@#
+    driverClassName: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        ddl-auto: none
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+
+razor-pay:
+  key-id: "rzp_test_b9oGIC0L3YDw9m"
+  key-secret: "WE6lD52xDRuBabmMzS0oxpoy"
