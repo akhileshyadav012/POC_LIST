@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
-
 
 import java.time.LocalTime;
 import java.util.List;
@@ -24,8 +22,8 @@ public class Bus {
     private String busId;
     private Integer busNo;
     private String busName;
-    private String routeFrom;
-    private String routeTo;
+    private String source;
+    private String destination;
     private LocalTime arrivalTime;
     private LocalTime departureTime;
     private Integer totalSeats;
@@ -40,4 +38,5 @@ public class Bus {
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "bus_id")
     private List<BusRoute> busRoutes;
+
 }

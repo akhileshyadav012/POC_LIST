@@ -16,8 +16,8 @@ import java.util.List;
 @Builder
 public class BusRequest {
     private String busName;
-    private String routeFrom;
-    private String routeTo;
+    private String source;
+    private String destination;
     private LocalTime arrivalTime;
     private LocalTime departureTime;
     private Integer totalSeats;

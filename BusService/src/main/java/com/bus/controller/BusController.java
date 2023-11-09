@@ -1,16 +1,20 @@
 package com.bus.controller;
 
+import com.bus.entity.Bus;
+import com.bus.entity.BusStop;
 import com.bus.request.BusRequest;
+import com.bus.request.SourceAndDestinationRequest;
 import com.bus.response.BusResponse;
 import com.bus.service.IBusService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/bus")
@@ -22,8 +26,43 @@ public class BusController {
 
     @PostMapping
     public ResponseEntity<BusResponse> addBus(@RequestBody BusRequest busRequest) {
+        logger.info("BusController - Inside addBus method");
         BusResponse busResponse = busService.addBus(busRequest);
         return ResponseEntity.ok(busResponse);
     }
 
+    @GetMapping("/{busId}")
+    public ResponseEntity<BusResponse> getBusById(@PathVariable(name = "busId") String busId){
+        logger.info("BusController - Inside getBusById method");
+        BusResponse response = busService.getBusById(busId);
+        return ResponseEntity.of(Optional.ofNullable(response));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Bus>> getAllBus(){
+        logger.info("BusController - Inside getAllBus method");
+        List<Bus> busList = busService.getAllBus();
+        return ResponseEntity.of(Optional.ofNullable(busList));
+    }
+
+    @DeleteMapping("/{busId}")
+    public ResponseEntity<Void> deleteBusById(@PathVariable(name = "busId") String busId){
+        logger.info("BusController - Inside deleteBusById method");
+        busService.deleteByBusId(busId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/stops/{busId}")
+    public ResponseEntity<List<BusStop>> getBusStopsById(@PathVariable(name = "busId") String busId){
+        logger.info("BusController - Inside getBusById method");
+        List<BusStop> busStopList = busService.getBusStopsById(busId);
+        return ResponseEntity.of(Optional.ofNullable(busStopList));
+    }
+
+    @PostMapping("/busId")
+    public ResponseEntity<String> getBusIdBySourceAndDestination(@RequestBody SourceAndDestinationRequest destinationRequest){
+        logger.info("BusController - Inside getBusIdBySourceAndDestination method");
+        busService.getBusIdBySourceAndDestination(destinationRequest);
+        return null;
+    }
 }

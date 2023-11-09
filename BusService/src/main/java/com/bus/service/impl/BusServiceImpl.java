@@ -1,23 +1,35 @@
 package com.bus.service.impl;
 
+import com.bus.constants.BusConstants;
 import com.bus.entity.Bus;
+import com.bus.entity.BusStop;
 import com.bus.enums.BusStatus;
+import com.bus.exception.NotFoundException;
+import com.bus.helper.Helper;
 import com.bus.repository.BusRepository;
+import com.bus.repository.BusRouteRepository;
 import com.bus.request.BusRequest;
+import com.bus.request.SourceAndDestinationRequest;
 import com.bus.response.BusResponse;
+import com.bus.response.GetBusesQueryResponse;
 import com.bus.service.IBusService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class BusServiceImpl implements IBusService {
     private static final Logger logger = LogManager.getLogger(BusServiceImpl.class);
 
+    @Autowired
+    private BusRouteRepository busRouteRepository;
     @Autowired
     private BusRepository busRepository;
     public BusResponse addBus(BusRequest busRequest){
@@ -30,8 +42,8 @@ public class BusServiceImpl implements IBusService {
         bus.setBusId(busId);
         bus.setBusNo(busNo);
         bus.setBusName(busRequest.getBusName());
-        bus.setRouteFrom(busRequest.getRouteFrom());
-        bus.setRouteTo(busRequest.getRouteTo());
+        bus.setSource(busRequest.getSource());
+        bus.setDestination(busRequest.getDestination());
         bus.setArrivalTime(busRequest.getArrivalTime());
         bus.setDepartureTime(busRequest.getDepartureTime());
         bus.setTotalSeats(busRequest.getTotalSeats());
@@ -42,22 +54,57 @@ public class BusServiceImpl implements IBusService {
         bus.setBusRoutes(busRequest.getBusRoutes());
         busRepository.save(bus);
 
-        BusResponse busResponse = BusResponse.builder()
-                .busId(bus.getBusId())
-                .busNo(bus.getBusNo())
-                .busName(bus.getBusName())
-                .routeFrom(bus.getRouteFrom())
-                .routeTo(bus.getRouteTo())
-                .arrivalTime(bus.getArrivalTime())
-                .departureTime(bus.getDepartureTime())
-                .totalSeats(bus.getTotalSeats())
-                .availableSeats(bus.getAvailableSeats())
-                .availableDays(bus.getAvailableDays())
-                .hailStops(bus.getHaltStops())
-                .busRoutes(bus.getBusRoutes())
-                .status(bus.getStatus())
-                .build();
+        BusResponse busResponse = Helper.convertEntitytoDto(bus);
         return busResponse;
     }
+    
+    public BusResponse getBusById(String busId){
+        logger.info("BusServiceImpl - Inside getBusById method");
+        Optional<Bus> optionalBus = busRepository.findByBusId(busId);
+        if (optionalBus.isEmpty()){
+            throw new NotFoundException(BusConstants.ERR_NOT_FOUND);
+        }
+        Bus bus = optionalBus.get();
+        BusResponse busResponse = Helper.convertEntitytoDto(bus);
+        return busResponse;
+    }
+
+    public List<Bus> getAllBus(){
+        logger.info("BusServiceImpl - Inside getAllBus method");
+        List<Bus> busList = busRepository.findAll();
+        return busList;
+    }
+
+    public void deleteByBusId(String busId){
+        logger.info("BusServiceImpl - Inside deleteByBusId method");
+        busRepository.deleteByBusId(busId);
+    }
+
+    public List<BusStop> getBusStopsById(String busId){
+        logger.info("BusServiceImpl - Inside getBusById method");
+        Optional<Bus> optionalBus = busRepository.findByBusId(busId);
+        if (optionalBus.isEmpty()){
+            throw new NotFoundException(BusConstants.ERR_NOT_FOUND);
+        }
+        Bus bus = optionalBus.get();
+        List<BusStop> haltStops = bus.getHaltStops();
+        return haltStops;
+    }
+
+    public String getBusIdBySourceAndDestination(SourceAndDestinationRequest destinationRequest){
+        logger.info("BusServiceImpl - Inside getBusIdBySourceAndDestination method");
+        List<GetBusesQueryResponse> busesIdList = busRouteRepository.getBusesIdsFromSourceAndDestination(destinationRequest.getSource(), destinationRequest.getDestination());
+        BusResponse busResponse = null;
+        for (GetBusesQueryResponse getBus : busesIdList){
+            Bus bus = busRepository.findByIdAndStatus(getBus.getBus_Id(), BusStatus.ACTIVE);
+//            System.out.println("bus = " + bus);
+            if (bus.getAvailableDays().contains(destinationRequest.getDay())){
+                busResponse = Helper.convertEntitytoDto(bus);
+                System.out.println("busresponse = " + busResponse);
+            }
+        }
+        return null;
+    }
+
 
 }

@@ -19,8 +19,8 @@ public class BusResponse {
     private String busId;
     private Integer busNo;
     private String busName;
-    private String routeFrom;
-    private String routeTo;
+    private String source;
+    private String destination;
     private LocalTime arrivalTime;
     private LocalTime departureTime;
     private Integer totalSeats;
