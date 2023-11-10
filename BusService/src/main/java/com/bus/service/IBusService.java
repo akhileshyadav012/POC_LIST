@@ -14,6 +14,6 @@ public interface IBusService {
     List<Bus> getAllBus();
     void deleteByBusId(String busId);
     List<BusStop> getBusStopsById(String busId);
-    String getBusIdBySourceAndDestination(SourceAndDestinationRequest destinationRequest);
+    List<BusResponse> getBusIdBySourceAndDestination(SourceAndDestinationRequest destinationRequest);
 
 }

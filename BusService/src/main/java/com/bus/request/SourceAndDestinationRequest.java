@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class SourceAndDestinationRequest {
     private String source;
     private String destination;
-    private String day;
+    private String date;
 }

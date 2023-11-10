@@ -60,9 +60,9 @@ public class BusController {
     }
 
     @PostMapping("/busId")
-    public ResponseEntity<String> getBusIdBySourceAndDestination(@RequestBody SourceAndDestinationRequest destinationRequest){
+    public ResponseEntity<List<BusResponse>> getBusIdBySourceAndDestination(@RequestBody SourceAndDestinationRequest destinationRequest){
         logger.info("BusController - Inside getBusIdBySourceAndDestination method");
-        busService.getBusIdBySourceAndDestination(destinationRequest);
-        return null;
+        List<BusResponse> busResponseList = busService.getBusIdBySourceAndDestination(destinationRequest);
+        return ResponseEntity.of(Optional.ofNullable(busResponseList));
     }
 }

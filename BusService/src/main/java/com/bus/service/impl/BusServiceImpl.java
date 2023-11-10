@@ -18,10 +18,10 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,20 +91,19 @@ public class BusServiceImpl implements IBusService {
         return haltStops;
     }
 
-    public String getBusIdBySourceAndDestination(SourceAndDestinationRequest destinationRequest){
+    public List<BusResponse> getBusIdBySourceAndDestination(SourceAndDestinationRequest destinationRequest){
         logger.info("BusServiceImpl - Inside getBusIdBySourceAndDestination method");
         List<GetBusesQueryResponse> busesIdList = busRouteRepository.getBusesIdsFromSourceAndDestination(destinationRequest.getSource(), destinationRequest.getDestination());
-        BusResponse busResponse = null;
+        LocalDate date = LocalDate.parse(destinationRequest.getDate(), DateTimeFormatter.ISO_DATE);
+        String dayOfWeek = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        List<BusResponse> busResponseList = new ArrayList<>();
         for (GetBusesQueryResponse getBus : busesIdList){
             Bus bus = busRepository.findByIdAndStatus(getBus.getBus_Id(), BusStatus.ACTIVE);
-//            System.out.println("bus = " + bus);
-            if (bus.getAvailableDays().contains(destinationRequest.getDay())){
-                busResponse = Helper.convertEntitytoDto(bus);
-                System.out.println("busresponse = " + busResponse);
+            if (Objects.nonNull(bus) && bus.getAvailableDays().contains(dayOfWeek)){
+                BusResponse busResponse = Helper.convertEntitytoDto(bus);
+                busResponseList.add(busResponse);
             }
         }
-        return null;
+        return busResponseList;
     }
-
-
 }
