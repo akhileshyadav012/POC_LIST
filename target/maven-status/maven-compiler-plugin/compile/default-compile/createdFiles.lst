@@ -1,0 +1,6 @@
+com/mapstruct/program/Demo.class
+com/mapstruct/mapper/ProductMapperImpl.class
+com/mapstruct/mapper/ProductMapper.class
+com/mapstruct/dto/ProductDTO.class
+com/mapstruct/entity/Product.class
+com/mapstruct/MapstructApplication.class
