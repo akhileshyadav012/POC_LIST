@@ -75,11 +75,6 @@ public class BusServiceImpl implements IBusService {
         return busList;
     }
 
-    public void deleteByBusId(String busId){
-        logger.info("BusServiceImpl - Inside deleteByBusId method");
-        busRepository.deleteByBusId(busId);
-    }
-
     public List<BusStop> getBusStopsById(String busId){
         logger.info("BusServiceImpl - Inside getBusById method");
         Optional<Bus> optionalBus = busRepository.findByBusId(busId);
@@ -89,6 +84,11 @@ public class BusServiceImpl implements IBusService {
         Bus bus = optionalBus.get();
         List<BusStop> haltStops = bus.getHaltStops();
         return haltStops;
+    }
+
+    public void deleteByBusId(String busId){
+        logger.info("BusServiceImpl - Inside deleteByBusId method");
+        busRepository.deleteByBusId(busId);
     }
 
     public List<BusResponse> getBusIdBySourceAndDestination(SourceAndDestinationRequest destinationRequest){

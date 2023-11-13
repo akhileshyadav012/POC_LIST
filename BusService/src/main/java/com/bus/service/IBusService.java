@@ -12,8 +12,8 @@ public interface IBusService {
     BusResponse addBus(BusRequest busRequest);
     BusResponse getBusById(String busId);
     List<Bus> getAllBus();
-    void deleteByBusId(String busId);
     List<BusStop> getBusStopsById(String busId);
+    void deleteByBusId(String busId);
     List<BusResponse> getBusIdBySourceAndDestination(SourceAndDestinationRequest destinationRequest);
 
 }

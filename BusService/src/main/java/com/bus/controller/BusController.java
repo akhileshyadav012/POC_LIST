@@ -44,19 +44,18 @@ public class BusController {
         List<Bus> busList = busService.getAllBus();
         return ResponseEntity.of(Optional.ofNullable(busList));
     }
+    @GetMapping("/stops/{busId}")
+    public ResponseEntity<List<BusStop>> getBusStopsById(@PathVariable(name = "busId") String busId){
+        logger.info("BusController - Inside getBusById method");
+        List<BusStop> busStopList = busService.getBusStopsById(busId);
+        return ResponseEntity.of(Optional.ofNullable(busStopList));
+    }
 
     @DeleteMapping("/{busId}")
     public ResponseEntity<Void> deleteBusById(@PathVariable(name = "busId") String busId){
         logger.info("BusController - Inside deleteBusById method");
         busService.deleteByBusId(busId);
         return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    @GetMapping("/stops/{busId}")
-    public ResponseEntity<List<BusStop>> getBusStopsById(@PathVariable(name = "busId") String busId){
-        logger.info("BusController - Inside getBusById method");
-        List<BusStop> busStopList = busService.getBusStopsById(busId);
-        return ResponseEntity.of(Optional.ofNullable(busStopList));
     }
 
     @PostMapping("/busId")
