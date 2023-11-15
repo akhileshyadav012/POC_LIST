@@ -56,4 +56,11 @@ public class UserController {
         return ResponseEntity.of(Optional.ofNullable(userResponse));
 
     }
+
+    @GetMapping("/demo")
+    public ResponseEntity<String> demo(){
+        logger.info("TicketController -Inside demoMethod method");
+        String number = userService.demo();
+        return ResponseEntity.of(Optional.ofNullable(number));
+    }
 }

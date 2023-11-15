@@ -107,4 +107,10 @@ public class UserServiceImpl implements IUserService {
 
         return userResponse;
     }
+
+    public String demo(){
+        logger.info("TicketServiceImpl - Inside demoMethod method");
+        String number = String.valueOf(100);
+        return number;
+    }
 }

@@ -12,4 +12,5 @@ public interface IUserService {
     List<User> getAllUser();
     void deleteUserById(String userId);
     UserResponse updateUserById(String userId, UserRequest userRequest);
+    String demo();
 }
