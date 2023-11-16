@@ -12,6 +12,7 @@ import com.user.service.IUserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,9 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     public UserResponse createUser(UserRequest userRequest){
         logger.info("UserServiceImpl - Inside createUser method");
         String uuid = String.valueOf(UUID.randomUUID());
@@ -34,8 +38,10 @@ public class UserServiceImpl implements IUserService {
                 .age(userRequest.getAge())
                 .mobileNo(userRequest.getMobileNo())
                 .email(userRequest.getEmail())
-                .role(UserRole.USER)
-                .status(UserStatus.ACTIVE)
+                .username(userRequest.getUsername())
+                .password(this.bCryptPasswordEncoder.encode(userRequest.getPassword()))
+                .role(String.valueOf(UserRole.ROLE_USER))
+                .status(String.valueOf(UserStatus.ACTIVE))
                 .build();
         userRepository.save(user);
 
@@ -45,6 +51,7 @@ public class UserServiceImpl implements IUserService {
                 .age(user.getAge())
                 .mobileNo(user.getMobileNo())
                 .email(user.getEmail())
+                .username(user.getUsername())
                 .role(user.getRole())
                 .status(user.getStatus())
                 .build();
@@ -64,6 +71,7 @@ public class UserServiceImpl implements IUserService {
                 .age(user.getAge())
                 .mobileNo(user.getMobileNo())
                 .email(user.getEmail())
+                .username(user.getUsername())
                 .role(user.getRole())
                 .status(user.getStatus())
                 .build();
@@ -93,6 +101,8 @@ public class UserServiceImpl implements IUserService {
         user.setEmail(userRequest.getEmail());
         user.setAge(userRequest.getAge());
         user.setMobileNo(userRequest.getMobileNo());
+        user.setUsername(userRequest.getUsername());
+        user.setPassword(this.bCryptPasswordEncoder.encode(userRequest.getPassword()));
         userRepository.save(user);
 
         UserResponse userResponse = UserResponse.builder()
@@ -101,6 +111,7 @@ public class UserServiceImpl implements IUserService {
                 .age(user.getAge())
                 .mobileNo(user.getMobileNo())
                 .email(user.getEmail())
+                .username(user.getUsername())
                 .role(user.getRole())
                 .status(user.getStatus())
                 .build();

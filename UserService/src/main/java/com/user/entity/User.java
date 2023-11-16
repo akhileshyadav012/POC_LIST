@@ -8,8 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -25,8 +23,8 @@ public class User {
     private int age;
     private String mobileNo;
     private String email;
-    @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.USER;
-    @Enumerated(EnumType.STRING)
-    private UserStatus status = UserStatus.ACTIVE;
+    private String username;
+    private String password;
+    private String role = String.valueOf(UserRole.ROLE_USER);
+    private String status = String.valueOf(UserStatus.ACTIVE);
 }
