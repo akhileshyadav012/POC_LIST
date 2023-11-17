@@ -4,6 +4,7 @@ import com.user.entity.User;
 import com.user.request.UserRequest;
 import com.user.response.UserResponse;
 import com.user.service.IUserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,5 +63,12 @@ public class UserController {
         logger.info("TicketController -Inside demoMethod method");
         String number = userService.demo();
         return ResponseEntity.of(Optional.ofNullable(number));
+    }
+
+    @GetMapping("/logged-in-user")
+    public ResponseEntity<UserResponse> getLoggedInUser(HttpServletRequest request) throws Exception {
+        logger.info("UserController - Inside getLoggedInUser method");
+        UserResponse userResponse = userService.getLoggedInUser(request);
+        return ResponseEntity.of(Optional.ofNullable(userResponse));
     }
 }

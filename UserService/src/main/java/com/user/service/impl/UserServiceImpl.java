@@ -1,6 +1,8 @@
 package com.user.service.impl;
 
+import com.user.configuration.CustomUserDetailService;
 import com.user.constants.UserConstants;
+import com.user.dto.UserDTO;
 import com.user.entity.User;
 import com.user.enums.UserRole;
 import com.user.enums.UserStatus;
@@ -8,7 +10,9 @@ import com.user.exception.NotFoundException;
 import com.user.repository.UserRepository;
 import com.user.request.UserRequest;
 import com.user.response.UserResponse;
+import com.user.security.JWTTokenHelper;
 import com.user.service.IUserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +28,12 @@ public class UserServiceImpl implements IUserService {
     private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private CustomUserDetailService customUserDetailService;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private JWTTokenHelper jwtTokenHelper;
 
     public UserResponse createUser(UserRequest userRequest){
         logger.info("UserServiceImpl - Inside createUser method");
@@ -45,17 +52,7 @@ public class UserServiceImpl implements IUserService {
                 .build();
         userRepository.save(user);
 
-        UserResponse userResponse = UserResponse.builder()
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .age(user.getAge())
-                .mobileNo(user.getMobileNo())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .role(user.getRole())
-                .status(user.getStatus())
-                .build();
-        return userResponse;
+        return UserDTO.convertToDto(user);
     }
 
     public UserResponse getUserById(String userId){
@@ -65,17 +62,7 @@ public class UserServiceImpl implements IUserService {
             throw new NotFoundException(UserConstants.USER_NOT_FOUND);
         }
         User user = optionalUser.get();
-        UserResponse userResponse = UserResponse.builder()
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .age(user.getAge())
-                .mobileNo(user.getMobileNo())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .role(user.getRole())
-                .status(user.getStatus())
-                .build();
-        return userResponse;
+        return UserDTO.convertToDto(user);
     }
 
     public List<User> getAllUser(){
@@ -105,18 +92,7 @@ public class UserServiceImpl implements IUserService {
         user.setPassword(this.bCryptPasswordEncoder.encode(userRequest.getPassword()));
         userRepository.save(user);
 
-        UserResponse userResponse = UserResponse.builder()
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .age(user.getAge())
-                .mobileNo(user.getMobileNo())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .role(user.getRole())
-                .status(user.getStatus())
-                .build();
-
-        return userResponse;
+        return UserDTO.convertToDto(user);
     }
 
     public String demo(){
@@ -124,4 +100,24 @@ public class UserServiceImpl implements IUserService {
         String number = String.valueOf(100);
         return number;
     }
+
+    public UserResponse getLoggedInUser(HttpServletRequest request) throws Exception {
+        logger.info("UserServiceImpl - Inside getLoggedInUser method");
+
+//        String username = CommonUtil.getLoggedinUser().getUsername();
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        System.out.println("commonutils = " + principal.toString());
+
+        String header = request.getHeader("Authorization");
+        String token = header.substring(7);
+        System.out.println("token of logged in user = " + token);
+        String usernameFromToken = jwtTokenHelper.getUsernameFromToken(token);
+        Optional<User> optionalUser = userRepository.findByUsername(usernameFromToken);
+        if (optionalUser.isEmpty()){
+            throw new NotFoundException("User nhi mila");
+        }
+        User user = optionalUser.get();
+        return UserDTO.convertToDto(user);
+    }
+
 }
