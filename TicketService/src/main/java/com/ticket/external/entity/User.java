@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +23,7 @@ public class User {
     private String mobileNo;
     private String email;
     @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.USER;
+    private UserRole role = UserRole.ROLE_USER;
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.ACTIVE;
 }

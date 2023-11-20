@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: TICKET-SERVICE
+  main:
+    allow-circular-references: true
   datasource:
     url: jdbc:mysql://localhost:3306/ticket_service_backend
     username: root

@@ -104,10 +104,6 @@ public class UserServiceImpl implements IUserService {
     public UserResponse getLoggedInUser(HttpServletRequest request) throws Exception {
         logger.info("UserServiceImpl - Inside getLoggedInUser method");
 
-//        String username = CommonUtil.getLoggedinUser().getUsername();
-//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        System.out.println("commonutils = " + principal.toString());
-
         String header = request.getHeader("Authorization");
         String token = header.substring(7);
         System.out.println("token of logged in user = " + token);

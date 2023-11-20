@@ -7,6 +7,7 @@ public class UserDTO {
 
     public static UserResponse convertToDto(User user){
         UserResponse userResponse = UserResponse.builder()
+                .userId(user.getUserId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .age(user.getAge())
