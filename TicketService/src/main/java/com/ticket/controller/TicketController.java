@@ -33,6 +33,20 @@ public class TicketController {
         TicketResponse ticketResponse = ticketService.createTicket(request);
         return ResponseEntity.of(Optional.ofNullable(ticketResponse));
     }
+
+    @GetMapping("/cancel/{ticketId}")
+    public ResponseEntity<TicketResponse> cancelTicket(@PathVariable("ticketId") String ticketId){
+        logger.info("TicketController - Inside cancelTicket method");
+        TicketResponse ticketResponse = ticketService.cancelTicket(ticketId);
+        return ResponseEntity.of(Optional.ofNullable(ticketResponse));
+    }
+
+    @GetMapping("/get-ticket/{ticketId}")
+    public ResponseEntity<TicketResponse> getTicketByTicketId(@PathVariable("ticketId") String ticketId){
+        logger.info("TicketController - Inside getTicketByTicketId method");
+        TicketResponse ticketResponse = ticketService.getTicketByTicketId(ticketId);
+        return ResponseEntity.of(Optional.ofNullable(ticketResponse));
+    }
 }
 
 

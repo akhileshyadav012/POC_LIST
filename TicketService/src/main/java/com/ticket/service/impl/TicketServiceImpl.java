@@ -3,6 +3,7 @@ package com.ticket.service.impl;
 import com.ticket.dto.TicketDto;
 import com.ticket.entity.Ticket;
 import com.ticket.enums.TicketStatus;
+import com.ticket.exception.NotFoundException;
 import com.ticket.external.impl.UserServiceFeignClient;
 import com.ticket.external.response.UserResponse;
 import com.ticket.repository.TicketRepository;
@@ -67,6 +68,30 @@ public class TicketServiceImpl implements ITicketService {
                 .build();
         ticketRepository.save(ticket);
 
+        return TicketDto.convertToDto(ticket);
+    }
+
+    public TicketResponse cancelTicket(String ticketId){
+        logger.info("TicketServiceImpl - Inside cancelTicket method");
+        Optional<Ticket> optionalTicket = ticketRepository.findByTicketId(ticketId);
+        if (optionalTicket.isEmpty()){
+            throw new NotFoundException("Ticket is not Present");
+        }
+        Ticket ticket = optionalTicket.get();
+        double refundAmount = 0;
+        ticket.setCancelTime(LocalDateTime.now());
+        ticket.setStatus(TicketStatus.CANCELLED);
+        ticketRepository.save(ticket);
+        return TicketDto.convertToDto(ticket);
+    }
+
+    public TicketResponse getTicketByTicketId(String ticketId){
+        logger.info("TicketServiceImpl - Inside getTicketByTicketId method");
+        Optional<Ticket> optionalTicket = ticketRepository.findByTicketId(ticketId);
+        if (optionalTicket.isEmpty()){
+            throw new NotFoundException("Ticket is not Present");
+        }
+        Ticket ticket = optionalTicket.get();
         return TicketDto.convertToDto(ticket);
     }
 }
