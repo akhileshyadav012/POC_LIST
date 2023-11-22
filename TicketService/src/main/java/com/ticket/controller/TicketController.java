@@ -1,9 +1,11 @@
 package com.ticket.controller;
 
+import com.ticket.enums.TicketStatus;
 import com.ticket.request.TicketRequest;
 import com.ticket.response.TicketResponse;
 import com.ticket.service.ITicketService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Path;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,14 @@ public class TicketController {
         logger.info("TicketController - Inside getTicketByTicketId method");
         TicketResponse ticketResponse = ticketService.getTicketByTicketId(ticketId);
         return ResponseEntity.of(Optional.ofNullable(ticketResponse));
+    }
+
+    @GetMapping("get-status/{ticketId}")
+    public ResponseEntity<TicketStatus> getStatusByTicketId(@PathVariable("ticketId") String ticketId){
+        logger.info("TicketController - Inside getStatusByTicketId method");
+        TicketStatus ticketStatus = ticketService.getStatusByTicketId(ticketId);
+        return ResponseEntity.of(Optional.ofNullable(ticketStatus));
+
     }
 }
 

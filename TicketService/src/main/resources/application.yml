@@ -30,3 +30,17 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+ticket:
+  queue:
+    name: ticket_queue
+  exchange:
+    name: ticket_exchange
+  routing:
+    key: ticket_routing_key

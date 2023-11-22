@@ -8,6 +8,7 @@ import com.ticket.external.impl.UserServiceFeignClient;
 import com.ticket.external.response.UserResponse;
 import com.ticket.repository.TicketRepository;
 import com.ticket.request.TicketRequest;
+import com.ticket.response.TicketMessageResponse;
 import com.ticket.response.TicketResponse;
 import com.ticket.service.ITicketService;
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +31,8 @@ public class TicketServiceImpl implements ITicketService {
     private UserServiceFeignClient serviceFeignClient;
     @Autowired
     private TicketRepository ticketRepository;
+    @Autowired
+    private RabbitMQProducerServiceImpl producerService;
 
     public String demoMethod(){
         logger.info("TicketServiceImpl - Inside demoMethod method");
@@ -68,6 +71,21 @@ public class TicketServiceImpl implements ITicketService {
                 .build();
         ticketRepository.save(ticket);
 
+        TicketMessageResponse messageResponse = new TicketMessageResponse();
+        messageResponse.setTicketNo(ticket.getTicketNo());
+        messageResponse.setTravellers(ticket.getTravellers());
+        messageResponse.setBusName(ticket.getBusName());
+        messageResponse.setSource(ticket.getSource());
+        messageResponse.setDestination(ticket.getDestination());
+        messageResponse.setSourceTime(ticket.getSourceTime());
+        messageResponse.setDestinationTime(ticket.getDestinationTime());
+        messageResponse.setJourneyDate(ticket.getJourneyDate());
+        messageResponse.setDistance(ticket.getDistance());
+        messageResponse.setTicketFare(ticket.getTicketFare());
+        String name = userResponse.getFirstName() + " " + userResponse.getLastName();
+        System.out.println("name = "+  name);
+        messageResponse.setName(name);
+        producerService.sendTicketDetails(messageResponse);
         return TicketDto.convertToDto(ticket);
     }
 
@@ -93,5 +111,15 @@ public class TicketServiceImpl implements ITicketService {
         }
         Ticket ticket = optionalTicket.get();
         return TicketDto.convertToDto(ticket);
+    }
+
+    public TicketStatus getStatusByTicketId(String ticketId){
+        logger.info("TicketServiceImpl - Inside getStatusByTicketId method");
+        Optional<Ticket> optionalTicket = ticketRepository.findByTicketId(ticketId);
+        if (optionalTicket.isEmpty()){
+            throw new NotFoundException("Ticket is not Present");
+        }
+        Ticket ticket = optionalTicket.get();
+        return ticket.getStatus();
     }
 }
