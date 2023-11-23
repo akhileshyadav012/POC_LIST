@@ -11,7 +11,6 @@ import java.util.Optional;
 
 public interface BusRepository extends JpaRepository<Bus, Integer> {
 
-    Bus findByBusNo(Integer busNo);
     Optional<Bus> findByBusId(String busId);
     @Transactional
     void deleteByBusId(String busId);

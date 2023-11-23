@@ -16,15 +16,11 @@ import java.util.List;
 @Builder
 public class BusRequest {
     private String busName;
-    private String source;
-    private String destination;
-    private LocalTime arrivalTime;
-    private LocalTime departureTime;
+    private String busNo;
     private Integer totalSeats;
     private List<String> availableDays;
     private List<BusStop> hailStops;
     private List<BusRoute> busRoutes;
-
 
 
 }

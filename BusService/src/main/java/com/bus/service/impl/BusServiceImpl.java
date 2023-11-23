@@ -34,21 +34,14 @@ public class BusServiceImpl implements IBusService {
     private BusRepository busRepository;
     public BusResponse addBus(BusRequest busRequest){
         logger.info("BusServiceImpl - Inside addBus method");
-        System.out.println("employee : " + busRequest);
-        Random random = new Random();
-        Integer busNo  = random. nextInt(900) + 100;
         String busId = String.valueOf(UUID.randomUUID());
         Bus bus = new Bus();
         bus.setBusId(busId);
-        bus.setBusNo(busNo);
+        bus.setBusNo(busRequest.getBusNo());
         bus.setBusName(busRequest.getBusName());
-        bus.setSource(busRequest.getSource());
-        bus.setDestination(busRequest.getDestination());
-        bus.setArrivalTime(busRequest.getArrivalTime());
-        bus.setDepartureTime(busRequest.getDepartureTime());
         bus.setTotalSeats(busRequest.getTotalSeats());
         bus.setAvailableSeats(busRequest.getTotalSeats());
-        bus.setAvailableDays(busRequest.getAvailableDays());
+        bus.setAvailableDays(convertListToString(busRequest.getAvailableDays()));
         bus.setStatus(BusStatus.ACTIVE);
         bus.setHaltStops(busRequest.getHailStops());
         bus.setBusRoutes(busRequest.getBusRoutes());
@@ -94,17 +87,22 @@ public class BusServiceImpl implements IBusService {
     public List<BusResponse> getBusIdBySourceAndDestination(SourceAndDestinationRequest destinationRequest){
         logger.info("BusServiceImpl - Inside getBusIdBySourceAndDestination method");
         List<GetBusesQueryResponse> busesIdList = busRouteRepository.getBusesIdsFromSourceAndDestination(destinationRequest.getSource(), destinationRequest.getDestination());
+        System.out.println("busidlist =  + " + busesIdList);
         LocalDate date = LocalDate.parse(destinationRequest.getDate(), DateTimeFormatter.ISO_DATE);
         String dayOfWeek = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         List<BusResponse> busResponseList = new ArrayList<>();
         for (GetBusesQueryResponse getBus : busesIdList){
-            Bus bus = busRepository.findByIdAndStatus(getBus.getBus_Id(), BusStatus.ACTIVE);
+            Bus bus = busRepository.findByIdAndStatus(getBus.getBusId(), BusStatus.ACTIVE);
             if (Objects.nonNull(bus) && bus.getAvailableDays().contains(dayOfWeek)){
                 BusResponse busResponse = Helper.convertEntitytoDto(bus);
                 busResponseList.add(busResponse);
             }
         }
         return busResponseList;
+    }
+
+    private static String convertListToString(List<String> ids) {
+        return ids.stream().map(Object::toString).collect(Collectors.joining(","));
     }
 
 }

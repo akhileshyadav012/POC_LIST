@@ -17,15 +17,11 @@ import java.util.List;
 @Builder
 public class BusResponse {
     private String busId;
-    private Integer busNo;
+    private String busNo;
     private String busName;
-    private String source;
-    private String destination;
-    private LocalTime arrivalTime;
-    private LocalTime departureTime;
     private Integer totalSeats;
     private Integer availableSeats;
-    private List<String> availableDays;
+    private String availableDays;
     private List<BusStop> hailStops;
     private List<BusRoute> busRoutes;
     private BusStatus status;
