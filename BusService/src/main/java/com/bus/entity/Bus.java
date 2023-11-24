@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -18,12 +17,10 @@ import java.util.List;
 public class Bus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private String busId;
+    private Integer busId;
     private String busNo;
     private String busName;
     private Integer totalSeats;
-    private Integer availableSeats;
     private String availableDays;
     @Enumerated(EnumType.STRING)
     private BusStatus status;

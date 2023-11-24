@@ -32,7 +32,7 @@ public class BusController {
     }
 
     @GetMapping("/{busId}")
-    public ResponseEntity<BusResponse> getBusById(@PathVariable(name = "busId") String busId){
+    public ResponseEntity<BusResponse> getBusById(@PathVariable(name = "busId") Integer busId){
         logger.info("BusController - Inside getBusById method");
         BusResponse response = busService.getBusById(busId);
         return ResponseEntity.of(Optional.ofNullable(response));
@@ -45,14 +45,14 @@ public class BusController {
         return ResponseEntity.of(Optional.ofNullable(busList));
     }
     @GetMapping("/stops/{busId}")
-    public ResponseEntity<List<BusStop>> getBusStopsById(@PathVariable(name = "busId") String busId){
+    public ResponseEntity<List<BusStop>> getBusStopsById(@PathVariable(name = "busId") Integer busId){
         logger.info("BusController - Inside getBusById method");
         List<BusStop> busStopList = busService.getBusStopsById(busId);
         return ResponseEntity.of(Optional.ofNullable(busStopList));
     }
 
     @DeleteMapping("/{busId}")
-    public ResponseEntity<Void> deleteBusById(@PathVariable(name = "busId") String busId){
+    public ResponseEntity<Void> deleteBusById(@PathVariable(name = "busId") Integer busId){
         logger.info("BusController - Inside deleteBusById method");
         busService.deleteByBusId(busId);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -64,4 +64,12 @@ public class BusController {
         List<BusResponse> busResponseList = busService.getBusIdBySourceAndDestination(destinationRequest);
         return ResponseEntity.of(Optional.ofNullable(busResponseList));
     }
+
+    @PutMapping("/update/{busId}")
+    public ResponseEntity<BusResponse> updateBus(@PathVariable(name = "busId") Integer busId ,@RequestBody BusRequest busRequest) {
+        logger.info("BusController - Inside addBus method");
+        BusResponse busResponse = busService.updateBus(busId, busRequest);
+        return ResponseEntity.ok(busResponse);
+    }
+
 }

@@ -8,6 +8,7 @@ import com.bus.exception.NotFoundException;
 import com.bus.helper.Helper;
 import com.bus.repository.BusRepository;
 import com.bus.repository.BusRouteRepository;
+import com.bus.repository.BusStopRepository;
 import com.bus.request.BusRequest;
 import com.bus.request.SourceAndDestinationRequest;
 import com.bus.response.BusResponse;
@@ -32,15 +33,14 @@ public class BusServiceImpl implements IBusService {
     private BusRouteRepository busRouteRepository;
     @Autowired
     private BusRepository busRepository;
+    @Autowired
+    private BusStopRepository busStopRepository;
     public BusResponse addBus(BusRequest busRequest){
         logger.info("BusServiceImpl - Inside addBus method");
-        String busId = String.valueOf(UUID.randomUUID());
         Bus bus = new Bus();
-        bus.setBusId(busId);
         bus.setBusNo(busRequest.getBusNo());
         bus.setBusName(busRequest.getBusName());
         bus.setTotalSeats(busRequest.getTotalSeats());
-        bus.setAvailableSeats(busRequest.getTotalSeats());
         bus.setAvailableDays(convertListToString(busRequest.getAvailableDays()));
         bus.setStatus(BusStatus.ACTIVE);
         bus.setHaltStops(busRequest.getHailStops());
@@ -51,7 +51,7 @@ public class BusServiceImpl implements IBusService {
         return busResponse;
     }
     
-    public BusResponse getBusById(String busId){
+    public BusResponse getBusById(Integer busId){
         logger.info("BusServiceImpl - Inside getBusById method");
         Optional<Bus> optionalBus = busRepository.findByBusId(busId);
         if (optionalBus.isEmpty()){
@@ -68,7 +68,7 @@ public class BusServiceImpl implements IBusService {
         return busList;
     }
 
-    public List<BusStop> getBusStopsById(String busId){
+    public List<BusStop> getBusStopsById(Integer busId){
         logger.info("BusServiceImpl - Inside getBusById method");
         Optional<Bus> optionalBus = busRepository.findByBusId(busId);
         if (optionalBus.isEmpty()){
@@ -79,7 +79,7 @@ public class BusServiceImpl implements IBusService {
         return haltStops;
     }
 
-    public void deleteByBusId(String busId){
+    public void deleteByBusId(Integer busId){
         logger.info("BusServiceImpl - Inside deleteByBusId method");
         busRepository.deleteByBusId(busId);
     }
@@ -87,12 +87,11 @@ public class BusServiceImpl implements IBusService {
     public List<BusResponse> getBusIdBySourceAndDestination(SourceAndDestinationRequest destinationRequest){
         logger.info("BusServiceImpl - Inside getBusIdBySourceAndDestination method");
         List<GetBusesQueryResponse> busesIdList = busRouteRepository.getBusesIdsFromSourceAndDestination(destinationRequest.getSource(), destinationRequest.getDestination());
-        System.out.println("busidlist =  + " + busesIdList);
         LocalDate date = LocalDate.parse(destinationRequest.getDate(), DateTimeFormatter.ISO_DATE);
         String dayOfWeek = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         List<BusResponse> busResponseList = new ArrayList<>();
         for (GetBusesQueryResponse getBus : busesIdList){
-            Bus bus = busRepository.findByIdAndStatus(getBus.getBusId(), BusStatus.ACTIVE);
+            Bus bus = busRepository.findByBusIdAndStatus(getBus.getBus_Id(), BusStatus.ACTIVE);
             if (Objects.nonNull(bus) && bus.getAvailableDays().contains(dayOfWeek)){
                 BusResponse busResponse = Helper.convertEntitytoDto(bus);
                 busResponseList.add(busResponse);
@@ -105,4 +104,26 @@ public class BusServiceImpl implements IBusService {
         return ids.stream().map(Object::toString).collect(Collectors.joining(","));
     }
 
+    public BusResponse updateBus(Integer busId, BusRequest busRequest){
+        logger.info("BusServiceImpl - Inside updateBus method");
+        if (busRequest.getBusRoutes() != null){
+            busRouteRepository.deleteBusRoute(busId);
+        }
+        if (busRequest.getHailStops() !=  null){
+            busStopRepository.deleteBusStops(busId);
+        }
+        Optional<Bus> optionalBus = busRepository.findByBusId(busId);
+        if (optionalBus.isEmpty()){
+            throw new NotFoundException("Bus not found to update");
+        }
+        Bus bus = optionalBus.get();
+        bus.setBusNo(bus.getBusNo());
+        bus.setBusName(bus.getBusName());
+        bus.setTotalSeats(busRequest.getTotalSeats());
+        bus.setAvailableDays(convertListToString(busRequest.getAvailableDays()));
+        bus.setHaltStops(busRequest.getHailStops());
+        bus.setBusRoutes(busRequest.getBusRoutes());
+        busRepository.save(bus);
+        return Helper.convertEntitytoDto(bus);
+    }
 }

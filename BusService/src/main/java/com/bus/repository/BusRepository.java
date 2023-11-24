@@ -11,10 +11,10 @@ import java.util.Optional;
 
 public interface BusRepository extends JpaRepository<Bus, Integer> {
 
-    Optional<Bus> findByBusId(String busId);
+    Optional<Bus> findByBusId(Integer busId);
     @Transactional
-    void deleteByBusId(String busId);
-    Bus findByIdAndStatus(Integer busId, BusStatus status);
+    void deleteByBusId(Integer busId);
+    Bus findByBusIdAndStatus(Integer busId, BusStatus status);
 
 
 //    @Query("SELECT b.id FROM Bus b join BusRoute br on b.id = br.bus_id where br.route_from = "Airoli" and br.route_to = "Rabale" and b.status = "ACTIVE" ")

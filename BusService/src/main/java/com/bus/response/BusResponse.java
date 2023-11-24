@@ -16,11 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class BusResponse {
-    private String busId;
     private String busNo;
     private String busName;
     private Integer totalSeats;
-    private Integer availableSeats;
     private String availableDays;
     private List<BusStop> hailStops;
     private List<BusRoute> busRoutes;

@@ -10,10 +10,12 @@ import java.util.List;
 
 public interface IBusService {
     BusResponse addBus(BusRequest busRequest);
-    BusResponse getBusById(String busId);
+    BusResponse getBusById(Integer busId);
     List<Bus> getAllBus();
-    List<BusStop> getBusStopsById(String busId);
-    void deleteByBusId(String busId);
+    List<BusStop> getBusStopsById(Integer busId);
+    void deleteByBusId(Integer busId);
     List<BusResponse> getBusIdBySourceAndDestination(SourceAndDestinationRequest destinationRequest);
+    BusResponse updateBus(Integer busId, BusRequest busRequest);
+
 
 }
