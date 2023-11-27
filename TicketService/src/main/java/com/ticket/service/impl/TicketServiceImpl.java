@@ -4,7 +4,9 @@ import com.ticket.dto.TicketDto;
 import com.ticket.entity.Ticket;
 import com.ticket.enums.TicketStatus;
 import com.ticket.exception.NotFoundException;
+import com.ticket.external.impl.BusServiceFeignClient;
 import com.ticket.external.impl.UserServiceFeignClient;
+import com.ticket.external.response.BusResponse;
 import com.ticket.external.response.UserResponse;
 import com.ticket.repository.TicketRepository;
 import com.ticket.request.TicketRequest;
@@ -30,6 +32,8 @@ public class TicketServiceImpl implements ITicketService {
     @Autowired
     private UserServiceFeignClient serviceFeignClient;
     @Autowired
+    private BusServiceFeignClient busServiceFeignClient;
+    @Autowired
     private TicketRepository ticketRepository;
     @Autowired
     private RabbitMQProducerServiceImpl producerService;
@@ -37,8 +41,12 @@ public class TicketServiceImpl implements ITicketService {
     public String demoMethod(){
         logger.info("TicketServiceImpl - Inside demoMethod method");
         String number = String.valueOf(5 + 3);
-        UserResponse userResponse = serviceFeignClient.getLoggedInUser();
-        System.out.println("userResponse = " + userResponse);
+//        UserResponse userResponse = serviceFeignClient.getLoggedInUser();
+//        System.out.println("userResponse = " + userResponse);
+
+        BusResponse busResponse = busServiceFeignClient.getBusById(1);
+        System.out.println("busResponse = " + busResponse);
+
         return number;
     }
 

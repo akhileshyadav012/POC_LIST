@@ -2,7 +2,6 @@ package com.ticket.external.impl;
 
 import com.ticket.external.response.UserResponse;
 import com.ticket.interceptor.FeignConfig;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

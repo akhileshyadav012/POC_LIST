@@ -28,9 +28,9 @@ public class TicketServiceApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println(queueName);
-		System.out.println(queueExchange);
-		System.out.println(queueRouting);
+//		System.out.println(queueName);
+//		System.out.println(queueExchange);
+//		System.out.println(queueRouting);
 
 	}
 }
