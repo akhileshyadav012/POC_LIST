@@ -27,9 +27,9 @@ public class Ticket {
     private String emailId;
     private String mobileNo;
     private String userId;
-    private int travellers;
+    private List<Long> travellers;
     private String busName;
-    private String busId;
+    private Integer busId;
     private String source;
     private String destination;
     private LocalTime sourceTime;

@@ -1,13 +1,16 @@
 package com.ticket.service.impl;
 
 import com.ticket.dto.TicketDto;
+import com.ticket.entity.SeatDetails;
 import com.ticket.entity.Ticket;
 import com.ticket.enums.TicketStatus;
 import com.ticket.exception.NotFoundException;
+import com.ticket.external.enums.BookStatus;
 import com.ticket.external.impl.BusServiceFeignClient;
 import com.ticket.external.impl.UserServiceFeignClient;
 import com.ticket.external.response.BusResponse;
 import com.ticket.external.response.UserResponse;
+import com.ticket.repository.SeatDetailsRepository;
 import com.ticket.repository.TicketRepository;
 import com.ticket.request.TicketRequest;
 import com.ticket.response.TicketMessageResponse;
@@ -19,14 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TicketServiceImpl implements ITicketService {
     private static final Logger logger = LogManager.getLogger(TicketServiceImpl.class);
-
     @Autowired
     private ITicketService ticketService;
     @Autowired
@@ -37,23 +40,24 @@ public class TicketServiceImpl implements ITicketService {
     private TicketRepository ticketRepository;
     @Autowired
     private RabbitMQProducerServiceImpl producerService;
+    @Autowired
+    private SeatDetailsRepository seatDetailsRepository;
 
-    public String demoMethod(){
+    public String demoMethod() {
         logger.info("TicketServiceImpl - Inside demoMethod method");
         String number = String.valueOf(5 + 3);
-//        UserResponse userResponse = serviceFeignClient.getLoggedInUser();
-//        System.out.println("userResponse = " + userResponse);
-
         BusResponse busResponse = busServiceFeignClient.getBusById(1);
         System.out.println("busResponse = " + busResponse);
 
         return number;
     }
 
-    public TicketResponse createTicket(TicketRequest request){
+    public TicketResponse createTicket(TicketRequest request) {
         logger.info("TicketServiceImpl - Inside createTicket method");
         UserResponse userResponse = serviceFeignClient.getLoggedInUser();
         System.out.println("userResponse = " + userResponse);
+        BusResponse busResponse = busServiceFeignClient.getBusById(request.getBusId());
+        System.out.println("busResponse = " + busResponse);
 
         Ticket ticket = Ticket.builder()
                 .ticketId(String.valueOf(UUID.randomUUID()))
@@ -77,30 +81,34 @@ public class TicketServiceImpl implements ITicketService {
                 .status(TicketStatus.BOOKED)
                 .passengers(request.getPassengers())
                 .build();
+
+        SeatDetails seatDetails = bookSeatDetails(request.getTravellers(), busResponse, request.getJourneyDate());
+
+
         ticketRepository.save(ticket);
 
-        TicketMessageResponse messageResponse = new TicketMessageResponse();
-        messageResponse.setTicketNo(ticket.getTicketNo());
-        messageResponse.setTravellers(ticket.getTravellers());
-        messageResponse.setBusName(ticket.getBusName());
-        messageResponse.setSource(ticket.getSource());
-        messageResponse.setDestination(ticket.getDestination());
-        messageResponse.setSourceTime(ticket.getSourceTime());
-        messageResponse.setDestinationTime(ticket.getDestinationTime());
-        messageResponse.setJourneyDate(ticket.getJourneyDate());
-        messageResponse.setDistance(ticket.getDistance());
-        messageResponse.setTicketFare(ticket.getTicketFare());
-        String name = userResponse.getFirstName() + " " + userResponse.getLastName();
-        System.out.println("name = "+  name);
-        messageResponse.setName(name);
-        producerService.sendTicketDetails(messageResponse);
+//        TicketMessageResponse messageResponse = new TicketMessageResponse();
+//        messageResponse.setTicketNo(ticket.getTicketNo());
+//        messageResponse.setTravellers(ticket.getTravellers());
+//        messageResponse.setBusName(ticket.getBusName());
+//        messageResponse.setSource(ticket.getSource());
+//        messageResponse.setDestination(ticket.getDestination());
+//        messageResponse.setSourceTime(ticket.getSourceTime());
+//        messageResponse.setDestinationTime(ticket.getDestinationTime());
+//        messageResponse.setJourneyDate(ticket.getJourneyDate());
+//        messageResponse.setDistance(ticket.getDistance());
+//        messageResponse.setTicketFare(ticket.getTicketFare());
+//        String name = userResponse.getFirstName() + " " + userResponse.getLastName();
+//        System.out.println("name = "+  name);
+//        messageResponse.setName(name);
+//        producerService.sendTicketDetails(messageResponse);
         return TicketDto.convertToDto(ticket);
     }
 
-    public TicketResponse cancelTicket(String ticketId){
+    public TicketResponse cancelTicket(String ticketId) {
         logger.info("TicketServiceImpl - Inside cancelTicket method");
         Optional<Ticket> optionalTicket = ticketRepository.findByTicketId(ticketId);
-        if (optionalTicket.isEmpty()){
+        if (optionalTicket.isEmpty()) {
             throw new NotFoundException("Ticket is not Present");
         }
         Ticket ticket = optionalTicket.get();
@@ -111,23 +119,84 @@ public class TicketServiceImpl implements ITicketService {
         return TicketDto.convertToDto(ticket);
     }
 
-    public TicketResponse getTicketByTicketId(String ticketId){
+    public TicketResponse getTicketByTicketId(String ticketId) {
         logger.info("TicketServiceImpl - Inside getTicketByTicketId method");
         Optional<Ticket> optionalTicket = ticketRepository.findByTicketId(ticketId);
-        if (optionalTicket.isEmpty()){
+        if (optionalTicket.isEmpty()) {
             throw new NotFoundException("Ticket is not Present");
         }
         Ticket ticket = optionalTicket.get();
         return TicketDto.convertToDto(ticket);
     }
 
-    public TicketStatus getStatusByTicketId(String ticketId){
+    public TicketStatus getStatusByTicketId(String ticketId) {
         logger.info("TicketServiceImpl - Inside getStatusByTicketId method");
         Optional<Ticket> optionalTicket = ticketRepository.findByTicketId(ticketId);
-        if (optionalTicket.isEmpty()){
+        if (optionalTicket.isEmpty()) {
             throw new NotFoundException("Ticket is not Present");
         }
         Ticket ticket = optionalTicket.get();
         return ticket.getStatus();
+    }
+
+    public SeatDetails getSeatDetailsByDate(Integer busId, LocalDate bookingDate){
+        logger.info("TicketServiceImpl - Inside getSeatDetailsByDate method");
+        Optional<SeatDetails> optionalSeatDetails = seatDetailsRepository.findByBusIdAndBookingDate(busId, bookingDate);
+        if (optionalSeatDetails.isEmpty()){
+            throw new NotFoundException("Seat Details are not available on this Date");
+        }
+        return optionalSeatDetails.get();
+    }
+
+    private static String convertListToString(List<String> ids) {
+        return ids.stream().map(Object::toString).collect(Collectors.joining(","));
+    }
+
+    public SeatDetails bookSeatDetails(List<Long> travellers, BusResponse busResponse, LocalDate bookingDate) {
+        logger.info("BusServiceImpl - Inside updateBus method");
+        Optional<SeatDetails> optionalSeatDetails = seatDetailsRepository.findByBusIdAndBookingDate(busResponse.getBusId(), bookingDate);
+
+        if (optionalSeatDetails.isEmpty()){
+            Map<Long, BookStatus> bookStatusMap = new HashMap<>();
+            for (Long seatNo : travellers) {
+                if (seatNo > busResponse.getTotalSeats()){
+                    throw new NotFoundException("Enter Valid SeatNo");
+                }
+                bookStatusMap.put(seatNo, BookStatus.BOOKED);
+            }
+            for (Map.Entry<Long, BookStatus> m : bookStatusMap.entrySet()) {
+                System.out.println(m.getKey() + " - " + m.getValue());
+            }
+            SeatDetails seatDetails = new SeatDetails();
+            seatDetails.setBusId(busResponse.getBusId());
+            seatDetails.setBookingDate(LocalDate.now());
+            seatDetails.setSeatDetails(bookStatusMap.toString());
+
+            seatDetailsRepository.save(seatDetails);
+        }
+
+            SeatDetails seatDetails = optionalSeatDetails.get();
+            String bookingSeatDetails = seatDetails.getSeatDetails();
+            System.out.println("bookingSeatDetails = " + bookingSeatDetails);
+
+            Map<Long, BookStatus> bookStatusMap = new HashMap<>();
+            String[] keyValuePairs = bookingSeatDetails.replaceAll("[{}]", "").split(", ");
+
+            for (String pair : keyValuePairs) {
+                String[] entry = pair.split("=");
+                Long key = Long.parseLong(entry[0]);
+                BookStatus value = BookStatus.valueOf(entry[1]);
+                bookStatusMap.put(key, value);
+            }
+            System.out.println(bookStatusMap);
+
+            for (Long seatNo : travellers){
+                bookStatusMap.put(seatNo, BookStatus.BOOKED);
+            }
+
+            seatDetails.setSeatDetails(bookStatusMap.toString());
+            seatDetailsRepository.save(seatDetails);
+
+        return seatDetails;
     }
 }

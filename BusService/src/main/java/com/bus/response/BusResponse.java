@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class BusResponse {
+    private Integer busId;
     private String busNo;
     private String busName;
     private Integer totalSeats;

@@ -2,6 +2,8 @@ package com.bus.controller;
 
 import com.bus.entity.Bus;
 import com.bus.entity.BusStop;
+import com.bus.entity.SeatDetails;
+import com.bus.enums.BookStatus;
 import com.bus.request.BusRequest;
 import com.bus.request.SourceAndDestinationRequest;
 import com.bus.response.BusResponse;
@@ -13,7 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -70,6 +74,20 @@ public class BusController {
         logger.info("BusController - Inside addBus method");
         BusResponse busResponse = busService.updateBus(busId, busRequest);
         return ResponseEntity.ok(busResponse);
+    }
+
+    @GetMapping("/capacity/{seatCapacity}")
+    public ResponseEntity<SeatDetails> seatCapacity(@PathVariable(name = "seatCapacity") List<Long> seatCapacity){
+        logger.info("BusController - Inside seatCapacity method");
+        SeatDetails seatDetails = busService.bookSeatDetails(seatCapacity);
+        return ResponseEntity.of(Optional.ofNullable(seatDetails));
+    }
+
+    @GetMapping("/updateCapacity")
+    public ResponseEntity<SeatDetails> updateSeatDetails(@RequestParam(name = "date")LocalDate date, @RequestParam(name = "seatCapacity") List<Long> seatCapacity){
+        logger.info("BusController - Inside updateSeatDetails method");
+        SeatDetails seatDetails = busService.updateBookSeatDetails(date, seatCapacity);
+        return ResponseEntity.of(Optional.ofNullable(seatDetails));
     }
 
 }

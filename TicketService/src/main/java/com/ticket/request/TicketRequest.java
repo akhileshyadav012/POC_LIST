@@ -18,9 +18,9 @@ import java.util.List;
 @Builder
 public class TicketRequest {
     private int ticketNo;
-    private int travellers;
+    private List<Long> travellers;
     private String busName;
-    private String busId;
+    private Integer busId;
     private String source;
     private String destination;
     private LocalTime sourceTime;

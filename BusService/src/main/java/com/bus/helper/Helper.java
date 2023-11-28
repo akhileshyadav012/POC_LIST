@@ -7,6 +7,7 @@ public class Helper {
 
     public static BusResponse convertEntitytoDto(Bus bus){
         BusResponse busResponse = BusResponse.builder()
+                .busId(bus.getBusId())
                 .busNo(bus.getBusNo())
                 .busName(bus.getBusName())
                 .totalSeats(bus.getTotalSeats())

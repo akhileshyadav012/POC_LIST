@@ -1,5 +1,6 @@
 package com.ticket.controller;
 
+import com.ticket.entity.SeatDetails;
 import com.ticket.enums.TicketStatus;
 import com.ticket.request.TicketRequest;
 import com.ticket.response.TicketResponse;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -37,26 +39,33 @@ public class TicketController {
     }
 
     @GetMapping("/cancel/{ticketId}")
-    public ResponseEntity<TicketResponse> cancelTicket(@PathVariable("ticketId") String ticketId){
+    public ResponseEntity<TicketResponse> cancelTicket(@PathVariable("ticketId") String ticketId) {
         logger.info("TicketController - Inside cancelTicket method");
         TicketResponse ticketResponse = ticketService.cancelTicket(ticketId);
         return ResponseEntity.of(Optional.ofNullable(ticketResponse));
     }
 
     @GetMapping("/get-ticket/{ticketId}")
-    public ResponseEntity<TicketResponse> getTicketByTicketId(@PathVariable("ticketId") String ticketId){
+    public ResponseEntity<TicketResponse> getTicketByTicketId(@PathVariable("ticketId") String ticketId) {
         logger.info("TicketController - Inside getTicketByTicketId method");
         TicketResponse ticketResponse = ticketService.getTicketByTicketId(ticketId);
         return ResponseEntity.of(Optional.ofNullable(ticketResponse));
     }
 
     @GetMapping("get-status/{ticketId}")
-    public ResponseEntity<TicketStatus> getStatusByTicketId(@PathVariable("ticketId") String ticketId){
+    public ResponseEntity<TicketStatus> getStatusByTicketId(@PathVariable("ticketId") String ticketId) {
         logger.info("TicketController - Inside getStatusByTicketId method");
         TicketStatus ticketStatus = ticketService.getStatusByTicketId(ticketId);
         return ResponseEntity.of(Optional.ofNullable(ticketStatus));
-
     }
+
+    @GetMapping("/getSeatDetails")
+    public ResponseEntity<SeatDetails> getSeatDetailsByDate( @RequestParam(name = "busId") Integer busId ,@RequestParam(name = "bookingDate") String bookingDate) {
+        logger.info("TicketController - Inside getSeatDetailsByDate method");
+        SeatDetails seatDetails = ticketService.getSeatDetailsByDate(busId,LocalDate.parse(bookingDate));
+        return ResponseEntity.of(Optional.ofNullable(seatDetails));
+    }
+
 }
 
 

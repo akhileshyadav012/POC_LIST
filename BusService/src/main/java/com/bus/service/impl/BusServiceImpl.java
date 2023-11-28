@@ -3,12 +3,15 @@ package com.bus.service.impl;
 import com.bus.constants.BusConstants;
 import com.bus.entity.Bus;
 import com.bus.entity.BusStop;
+import com.bus.entity.SeatDetails;
+import com.bus.enums.BookStatus;
 import com.bus.enums.BusStatus;
 import com.bus.exception.NotFoundException;
 import com.bus.helper.Helper;
 import com.bus.repository.BusRepository;
 import com.bus.repository.BusRouteRepository;
 import com.bus.repository.BusStopRepository;
+import com.bus.repository.SeatDetailsRepository;
 import com.bus.request.BusRequest;
 import com.bus.request.SourceAndDestinationRequest;
 import com.bus.response.BusResponse;
@@ -35,6 +38,9 @@ public class BusServiceImpl implements IBusService {
     private BusRepository busRepository;
     @Autowired
     private BusStopRepository busStopRepository;
+
+    @Autowired
+    private SeatDetailsRepository seatDetailsRepository;
     public BusResponse addBus(BusRequest busRequest){
         logger.info("BusServiceImpl - Inside addBus method");
         Bus bus = new Bus();
@@ -125,5 +131,57 @@ public class BusServiceImpl implements IBusService {
         bus.setBusRoutes(busRequest.getBusRoutes());
         busRepository.save(bus);
         return Helper.convertEntitytoDto(bus);
+    }
+
+    public SeatDetails bookSeatDetails(List<Long> seatCapacity){
+        logger.info("BusServiceImpl - Inside updateBus method");
+
+        List<SeatDetails> seatDetailsList = new ArrayList<>();
+
+        Map<Long, BookStatus> bookStatusMap = new HashMap<>();
+        for (Long seatNo : seatCapacity){
+            bookStatusMap.put(seatNo, BookStatus.BOOKED);
+        }
+        for (Map.Entry<Long, BookStatus> m: bookStatusMap.entrySet()){
+            System.out.println(m.getKey() + " - " + m.getValue());
+        }
+
+        SeatDetails seatDetails = new SeatDetails();
+        seatDetails.setBusId(1);
+        seatDetails.setBookingDate(LocalDate.now());
+        seatDetails.setSeatDetails(bookStatusMap.toString());
+
+        seatDetailsRepository.save(seatDetails);
+        return seatDetails;
+    }
+
+    public SeatDetails updateBookSeatDetails(LocalDate date, List<Long> seatCapacity){
+        logger.info("BusServiceImpl - Inside updateBookSeatDetails method");
+        Optional<SeatDetails> optionalSeatDetails = seatDetailsRepository.findByBookingDate(date);
+        if (optionalSeatDetails.isEmpty()){
+            throw new NotFoundException("details not present");
+        }
+        SeatDetails seatDetails = optionalSeatDetails.get();
+        String bookingSeatDetails = seatDetails.getSeatDetails();
+        System.out.println("bookingSeatDetails = " + bookingSeatDetails);
+
+        Map<Long, BookStatus> bookStatusMap = new HashMap<>();
+        String[] keyValuePairs = bookingSeatDetails.replaceAll("[{}]", "").split(", ");
+
+        for (String pair : keyValuePairs) {
+            String[] entry = pair.split("=");
+            Long key = Long.parseLong(entry[0]);
+            BookStatus value = BookStatus.valueOf(entry[1]);
+            bookStatusMap.put(key, value);
+        }
+        System.out.println(bookStatusMap);
+
+        for (Long seatNo : seatCapacity){
+            bookStatusMap.put(seatNo, BookStatus.BOOKED);
+        }
+
+        seatDetails.setSeatDetails(bookStatusMap.toString());
+        seatDetailsRepository.save(seatDetails);
+        return seatDetails;
     }
 }
