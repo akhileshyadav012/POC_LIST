@@ -1,17 +1,20 @@
 package com.ticket.service.impl;
 
 import com.ticket.dto.TicketDto;
+import com.ticket.entity.OrderDetails;
 import com.ticket.entity.SeatDetails;
 import com.ticket.entity.Ticket;
 import com.ticket.enums.TicketStatus;
 import com.ticket.exception.NotFoundException;
 import com.ticket.external.enums.BookStatus;
 import com.ticket.external.impl.BusServiceFeignClient;
+import com.ticket.external.impl.PaymentServiceFeignClient;
 import com.ticket.external.impl.UserServiceFeignClient;
 import com.ticket.external.response.BusResponse;
 import com.ticket.external.response.UserResponse;
 import com.ticket.repository.SeatDetailsRepository;
 import com.ticket.repository.TicketRepository;
+import com.ticket.request.CreateOrderRequest;
 import com.ticket.request.TicketRequest;
 import com.ticket.response.TicketMessageResponse;
 import com.ticket.response.TicketResponse;
@@ -22,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -42,13 +46,16 @@ public class TicketServiceImpl implements ITicketService {
     private RabbitMQProducerServiceImpl producerService;
     @Autowired
     private SeatDetailsRepository seatDetailsRepository;
+    @Autowired
+    private PaymentServiceFeignClient paymentServiceFeignClient;
 
     public String demoMethod() {
         logger.info("TicketServiceImpl - Inside demoMethod method");
         String number = String.valueOf(5 + 3);
-        BusResponse busResponse = busServiceFeignClient.getBusById(1);
-        System.out.println("busResponse = " + busResponse);
-
+//        BusResponse busResponse = busServiceFeignClient.getBusById(1);
+//        System.out.println("busResponse = " + busResponse);
+        OrderDetails orderDetails = paymentServiceFeignClient.createOrder(new CreateOrderRequest(BigDecimal.valueOf(12.32)));
+        System.out.println("orderDetails = " + orderDetails);
         return number;
     }
 
@@ -81,27 +88,30 @@ public class TicketServiceImpl implements ITicketService {
                 .status(TicketStatus.BOOKED)
                 .passengers(request.getPassengers())
                 .build();
-
         SeatDetails seatDetails = bookSeatDetails(request.getTravellers(), busResponse, request.getJourneyDate());
+        System.out.println("seatDetails = " + seatDetails);
 
+        OrderDetails orderDetails = paymentServiceFeignClient.createOrder(new CreateOrderRequest(BigDecimal.valueOf(ticket.getTicketFare())));
+        String status = orderDetails.getStatus();
+        if (status.equalsIgnoreCase("created")){
+            ticketRepository.save(ticket);
+        }
+        TicketMessageResponse messageResponse = new TicketMessageResponse();
+        messageResponse.setTicketNo(ticket.getTicketNo());
+        messageResponse.setTravellers(ticket.getTravellers());
+        messageResponse.setBusName(ticket.getBusName());
+        messageResponse.setSource(ticket.getSource());
+        messageResponse.setDestination(ticket.getDestination());
+        messageResponse.setSourceTime(ticket.getSourceTime());
+        messageResponse.setDestinationTime(ticket.getDestinationTime());
+        messageResponse.setJourneyDate(ticket.getJourneyDate());
+        messageResponse.setDistance(ticket.getDistance());
+        messageResponse.setTicketFare(ticket.getTicketFare());
+        String name = userResponse.getFirstName() + " " + userResponse.getLastName();
+        System.out.println("name = "+  name);
+        messageResponse.setName(name);
+        producerService.sendTicketDetails(messageResponse);
 
-        ticketRepository.save(ticket);
-
-//        TicketMessageResponse messageResponse = new TicketMessageResponse();
-//        messageResponse.setTicketNo(ticket.getTicketNo());
-//        messageResponse.setTravellers(ticket.getTravellers());
-//        messageResponse.setBusName(ticket.getBusName());
-//        messageResponse.setSource(ticket.getSource());
-//        messageResponse.setDestination(ticket.getDestination());
-//        messageResponse.setSourceTime(ticket.getSourceTime());
-//        messageResponse.setDestinationTime(ticket.getDestinationTime());
-//        messageResponse.setJourneyDate(ticket.getJourneyDate());
-//        messageResponse.setDistance(ticket.getDistance());
-//        messageResponse.setTicketFare(ticket.getTicketFare());
-//        String name = userResponse.getFirstName() + " " + userResponse.getLastName();
-//        System.out.println("name = "+  name);
-//        messageResponse.setName(name);
-//        producerService.sendTicketDetails(messageResponse);
         return TicketDto.convertToDto(ticket);
     }
 

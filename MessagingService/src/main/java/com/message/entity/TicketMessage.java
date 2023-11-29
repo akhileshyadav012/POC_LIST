@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -26,7 +27,7 @@ public class TicketMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ticketId;
     private int ticketNo;
-    private int travellers;
+    private List<Long> travellers;
     private String busName;
     private String source;
     private String destination;

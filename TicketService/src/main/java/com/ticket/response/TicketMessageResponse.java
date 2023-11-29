@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,7 +18,7 @@ import java.time.LocalTime;
 @Builder
 public class TicketMessageResponse {
     private int ticketNo;
-    private int travellers;
+    private List<Long> travellers;
     private String busName;
     private String source;
     private String destination;

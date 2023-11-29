@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class RabbitMQConsumerServiceImpl implements IRabbitMQConsumerService {
     private static final Logger logger = LogManager.getLogger(RabbitMQConsumerServiceImpl.class);
@@ -40,6 +43,10 @@ public class RabbitMQConsumerServiceImpl implements IRabbitMQConsumerService {
                 .build();
 
         ticketMessageRepository.save(ticketMessage);
+    }
+
+    private static String convertListToString(List<String> ids) {
+        return ids.stream().map(Object::toString).collect(Collectors.joining(","));
     }
 
 }
