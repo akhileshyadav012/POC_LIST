@@ -62,6 +62,7 @@ public class JWTTokenHelper {
         claims.put("username", user.getUsername());
         claims.put("role", user.getRole());
         claims.put("status", user.getStatus());
+
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
