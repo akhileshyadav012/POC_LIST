@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: API-GATEWAY
+
+  cloud:
+    gateway:
+      routes:
+        - id: USER-SERVICE
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/v1/users/**, /v1/auth/**
+
+        - id: BUS-SERVICE
+          uri: lb://BUS-SERVICE
+          predicates:
+            - Path=/v1/bus/**
+
+        - id: TICKET-SERVICE
+          uri: lb://TICKET-SERVICE
+          predicates:
+            - Path=/v1/tickets/**, /v1/rabbit/**
+
+        - id: MESSAGING-SERVICE
+          uri: lb://MESSAGING-SERVICE
+          predicates:
+            - Path=/v1/message/**
+
+        - id: PAYMENT-SERVICE
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/v1/orders/**
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka

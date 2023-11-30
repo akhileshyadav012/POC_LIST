@@ -1,8 +1,13 @@
 package com.user.security;
 
+import com.user.configuration.CustomUserDetailService;
+import com.user.configuration.CustomUserDetails;
+import com.user.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +18,9 @@ import java.util.function.Function;
 
 @Component
 public class JWTTokenHelper {
+
+    @Autowired
+    private CustomUserDetailService customUserDetailService;
 
     public static final long JWT_TOKEN_VALIDITY = 600000;
     private String secret = "Ganeshaa";
@@ -42,8 +50,18 @@ public class JWTTokenHelper {
         return expiration.before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(CustomUserDetails userDetails, User user) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("userId", user.getUserId());
+        claims.put("firstName", user.getFirstName());
+        claims.put("lastName", user.getLastName());
+        claims.put("age", user.getAge());
+        claims.put("mobileNo", user.getMobileNo());
+        claims.put("email", user.getEmail());
+        claims.put("username", user.getUsername());
+        claims.put("role", user.getRole());
+        claims.put("status", user.getStatus());
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
@@ -60,4 +78,5 @@ public class JWTTokenHelper {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
 }

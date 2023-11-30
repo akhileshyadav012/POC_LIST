@@ -1,7 +1,9 @@
 package com.user.controller;
 
 import com.user.configuration.CustomUserDetailService;
+import com.user.configuration.CustomUserDetails;
 import com.user.entity.AccessToken;
+import com.user.entity.User;
 import com.user.exception.NotFoundException;
 import com.user.repository.AccessTokenRepository;
 import com.user.request.JWTAuthRequest;
@@ -13,8 +15,11 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,9 +46,9 @@ public class AuthController {
     public ResponseEntity<JWTAuthResponse> login(@RequestBody JWTAuthRequest request) {
         logger.info("AuthController - Inside login method");
         authenticate(request.getUsername(), request.getPassword());
-        UserDetails userDetails = customUserDetailService.loadUserByUsername(request.getUsername());
-        String generatedToken = jwtTokenHelper.generateToken(userDetails);
-        System.out.println("generatedToken = " + generatedToken);
+        CustomUserDetails userDetails = (CustomUserDetails) customUserDetailService.loadUserByUsername(request.getUsername());
+        User user = userDetails.getUser();
+        String generatedToken = jwtTokenHelper.generateToken(userDetails, user);
 
         AccessToken accessToken = new AccessToken();
         accessToken.setToken(generatedToken);
