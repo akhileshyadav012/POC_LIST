@@ -18,4 +18,5 @@ public interface BusRouteRepository extends JpaRepository<BusRoute, Integer> {
     @Modifying
     @Query(nativeQuery = true, value = "delete from bus_route bs where bs.bus_id = :bus_Id")
     void deleteBusRoute(@Param("bus_Id") Integer bus_Id);
+
 }

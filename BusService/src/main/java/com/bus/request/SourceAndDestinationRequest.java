@@ -11,4 +11,5 @@ public class SourceAndDestinationRequest {
     private String source;
     private String destination;
     private String date;
+
 }

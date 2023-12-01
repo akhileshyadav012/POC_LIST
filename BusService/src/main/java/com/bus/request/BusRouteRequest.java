@@ -18,4 +18,5 @@ public class BusRouteRequest {
     private String routeTo;
     private double distance;
     private double fare;
+
 }

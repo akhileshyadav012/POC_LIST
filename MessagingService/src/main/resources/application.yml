@@ -4,6 +4,20 @@ server:
 spring:
   application:
     name: MESSAGING-SERVICE
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: neosoftmail54321@gmail.com
+    password: prfefnrqlebofqqj
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
   main:
     allow-circular-references: true
   datasource:

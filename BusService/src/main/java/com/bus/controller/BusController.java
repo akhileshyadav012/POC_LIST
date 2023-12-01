@@ -67,6 +67,7 @@ public class BusController {
         logger.info("BusController - Inside getBusIdBySourceAndDestination method");
         List<BusResponse> busResponseList = busService.getBusIdBySourceAndDestination(destinationRequest);
         return ResponseEntity.of(Optional.ofNullable(busResponseList));
+
     }
 
     @PutMapping("/update/{busId}")
