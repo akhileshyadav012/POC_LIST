@@ -23,7 +23,8 @@ public class JWTTokenHelper {
     private CustomUserDetailService customUserDetailService;
 
     public static final long JWT_TOKEN_VALIDITY = 600000;
-    private String secret = "Ganeshaa";
+//    private String secret = "Ganeshaa";
+    private String secret = "wcVoYHql7Bdz416aEkePjTqyRJLZBDSkK8s3EgZCVdDdmOM7beUKNxdI8JpatVnr2amtwIhxHWtk0pB7Vtx0Yluic0n7j3e8gJBoH97wqmro0HGg6iQruvgOqxn45HfV0OCIB86SlxGImejl7zHozN3lovxdh0";
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);

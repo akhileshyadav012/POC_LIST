@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: API-GATEWAY
+  main:
+    allow-circular-references: true
 
   cloud:
     gateway:
@@ -12,11 +14,15 @@ spring:
           uri: lb://USER-SERVICE
           predicates:
             - Path=/v1/users/**, /v1/auth/**
+          filters:
+            - AuthenticationFilter
 
         - id: BUS-SERVICE
           uri: lb://BUS-SERVICE
           predicates:
             - Path=/v1/bus/**
+          filters:
+            - AuthenticationFilter
 
         - id: TICKET-SERVICE
           uri: lb://TICKET-SERVICE
