@@ -71,7 +71,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 System.out.println("Username is null OR Authentication is not null");
             }
         }
-
         filterChain.doFilter(request, response);
     }
 }

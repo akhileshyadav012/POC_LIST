@@ -54,16 +54,14 @@ public class JWTTokenHelper {
     public String generateToken(CustomUserDetails userDetails, User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId());
-        claims.put("userId", user.getUserId());
-        claims.put("firstName", user.getFirstName());
-        claims.put("lastName", user.getLastName());
-        claims.put("age", user.getAge());
-        claims.put("mobileNo", user.getMobileNo());
-        claims.put("email", user.getEmail());
-        claims.put("username", user.getUsername());
+//        claims.put("userId", user.getUserId());
+//        claims.put("firstName", user.getFirstName());
+//        claims.put("lastName", user.getLastName());
+//        claims.put("age", user.getAge());
+//        claims.put("mobileNo", user.getMobileNo());
+//        claims.put("email", user.getEmail());
+//        claims.put("username", user.getUsername());
         claims.put("role", user.getRole());
-        claims.put("status", user.getStatus());
-
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
