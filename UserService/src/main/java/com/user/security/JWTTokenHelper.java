@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -51,17 +52,13 @@ public class JWTTokenHelper {
         return expiration.before(new Date());
     }
 
-    public String generateToken(CustomUserDetails userDetails, User user) {
+    public String generateToken(CustomUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("id", user.getId());
-//        claims.put("userId", user.getUserId());
-//        claims.put("firstName", user.getFirstName());
-//        claims.put("lastName", user.getLastName());
-//        claims.put("age", user.getAge());
-//        claims.put("mobileNo", user.getMobileNo());
-//        claims.put("email", user.getEmail());
-//        claims.put("username", user.getUsername());
-        claims.put("role", user.getRole());
+        GrantedAuthority grantedAuthority = userDetails.getAuthorities().stream().toList().get(0);
+        System.out.println("grantedAuthority : " + grantedAuthority.getAuthority());
+        claims.put("username", userDetails.getUsername());
+        claims.put("userId", userDetails.getUserId());
+        claims.put("role", grantedAuthority.getAuthority());
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
@@ -70,7 +67,7 @@ public class JWTTokenHelper {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 100))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 

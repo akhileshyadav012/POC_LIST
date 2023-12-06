@@ -1,5 +1,6 @@
 package com.gateway.filter;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -15,6 +16,7 @@ public class JwtService {
     public void validateToken(final String token)
     {
         Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
+//        Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
 
     }
 
